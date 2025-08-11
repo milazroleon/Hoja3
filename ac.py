@@ -102,10 +102,8 @@ def get_tree_search_for_bcn(bcn, phi=None):
 
     domains, constraints = deepcopy(bcn)
 
-    # Ejecutar AC3 al inicio para reducir el problema al máximo
     (domains, constraints), posible = ac3((domains, constraints))
     if not posible:
-        # Si no hay solución, devolvemos búsqueda vacía
         return PathlessTreeSearch(n0=domains, succ=lambda _: [], goal=lambda _: False), lambda _: {}
 
     def goal(current_domains):
