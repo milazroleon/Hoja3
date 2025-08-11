@@ -99,11 +99,14 @@ def get_tree_search_for_bcn(bcn, phi=None):
     """
 
     from copy import deepcopy
+
     domains, constraints = deepcopy(bcn)
 
+    # Ejecutar AC3 al inicio para reducir el problema al máximo
     (domains, constraints), posible = ac3((domains, constraints))
     if not posible:
-        return None, None
+        # Si no hay solución, devolvemos búsqueda vacía
+        return PathlessTreeSearch(n0=domains, succ=lambda _: [], goal=lambda _: False), lambda _: {}
 
     def goal(current_domains):
         return all(len(v) == 1 for v in current_domains.values())
@@ -116,7 +119,6 @@ def get_tree_search_for_bcn(bcn, phi=None):
                 (v for v in current_domains if len(current_domains[v]) > 1),
                 key=lambda k: len(current_domains[k])
             )
-
         succesors = []
         for val in current_domains[var]:
             new_dom = deepcopy(current_domains)
@@ -134,6 +136,7 @@ def get_tree_search_for_bcn(bcn, phi=None):
         succ=succ,
         goal=goal
     ), decoder
+
 
 def get_binarized_constraints_for_all_diff(domains):
 
