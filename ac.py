@@ -85,26 +85,13 @@ def ac3(bcn):
 
 def get_tree_search_for_bcn(bcn, phi=None):
 
-    """
-        Generates a PathlessTreeSearch that can find a solution in the search space described by the BCN.
-
-    Args:
-        bcn ((domains, constraints)): The BCN in which we look for a solution.
-        phi (func, optional): Function that takes a dictionary of domains (variables are keys) and selects the variable to fix next.
-
-    Returns:
-        (search, decoder), where
-         - search is a PathlessTreeSearch object
-         - decoder is a function to decode a node to an assignment
-    """
-
     from copy import deepcopy
 
     domains, constraints = deepcopy(bcn)
 
-    (domains, constraints), posible = ac3((domains, constraints))
+    (reduced_domains, constraints), posible = ac3((domains, constraints))
     if not posible:
-        return PathlessTreeSearch(n0=domains, succ=lambda _: [], goal=lambda _: False), lambda _: {}
+        return PathlessTreeSearch(n0=reduced_domains, succ=lambda _: [], goal=lambda _: False), lambda _: {}
 
     def goal(current_domains):
         return all(len(v) == 1 for v in current_domains.values())
@@ -117,6 +104,7 @@ def get_tree_search_for_bcn(bcn, phi=None):
                 (v for v in current_domains if len(current_domains[v]) > 1),
                 key=lambda k: len(current_domains[k])
             )
+
         succesors = []
         for val in current_domains[var]:
             new_dom = deepcopy(current_domains)
@@ -130,7 +118,7 @@ def get_tree_search_for_bcn(bcn, phi=None):
         return {var: vals[0] for var, vals in final_domains.items()}
 
     return PathlessTreeSearch(
-        n0=domains,
+        n0=reduced_domains,
         succ=succ,
         goal=goal
     ), decoder
