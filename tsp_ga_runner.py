@@ -58,10 +58,10 @@ def crossover(random_state, p1, p2):
             succ2[pos2 % n] = gen
             pos2 += 1
 
-    if succ1 == p1 or succ1 == p2:
+    if np.array_equal(succ1, p1) or np.array_equal(succ1, p2):
         i, j = random_state.choice(n, size=2, replace=False)
         succ1[i], succ1[j] = succ1[j], succ1[i]
-    if succ2 == p1 or succ2 == p2:
+    if np.array_equal(succ2, p1) or np.array_equal(succ2, p2):
         i, j = random_state.choice(n, size=2, replace=False)
         succ2[i], succ2[j] = succ2[j], succ2[i]
 
@@ -79,7 +79,7 @@ def mutate(random_state, i):
         list: a mutant copy of the given individual `i`
     """
 
-    m = i[:]
+    m = list(i)
     a, b = random_state.choice(len(m), size=2, replace=False)
     m[a], m[b] = m[b], m[a]
     return m
