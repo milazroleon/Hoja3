@@ -153,15 +153,12 @@ def get_binarized_constraints_for_all_diff(domains):
         for j in range(i + 1, len(variables)):
             Xi, Xj = variables[i], variables[j]
 
-            # capture Xi, Xj in default args to avoid late-binding issues
             def make_neq(Xi=Xi, Xj=Xj):
                 def neq(*args):
                     if len(args) == 1:
-                        # called as constraint(assignments_dict)
                         assignments = args[0]
                         return assignments[Xi] != assignments[Xj]
                     elif len(args) == 2:
-                        # called as constraint(a, b)
                         a, b = args
                         return a != b
                     else:
