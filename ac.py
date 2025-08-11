@@ -99,8 +99,11 @@ def get_tree_search_for_bcn(bcn, phi=None):
     """
 
     from copy import deepcopy
+    domains, constraints = deepcopy(bcn)
 
-    domains, constraints = bcn
+    (domains, constraints), posible = ac3((domains, constraints))
+    if not posible:
+        return None, None
 
     def goal(current_domains):
         return all(len(v) == 1 for v in current_domains.values())
@@ -143,16 +146,16 @@ def get_binarized_constraints_for_all_diff(domains):
     Returns:
         dict: dictionary where keys are constraint names (it is recommended to use tuples, with entries in the tuple being the variable names sorted lexicographically) and values are the functions encoding the respective constraint set membership
     """
-
     constraints = {}
     variables = sorted(domains.keys())
+
     for i in range(len(variables)):
         for j in range(i + 1, len(variables)):
             Xi, Xj = variables[i], variables[j]
-            def make_neq():
-                def neq(a, b):
-                    return a != b
+            def make_neq(Xi, Xj):
+                def neq(assignments):
+                    return assignments[Xi] != assignments[Xj]
                 return neq
-            constraints[(Xi, Xj)] = make_neq()
+            constraints[(Xi, Xj)] = make_neq(Xi, Xj)
 
     return constraints
